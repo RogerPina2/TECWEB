@@ -1,0 +1,83 @@
+package br.edu.insper.controller;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.insper.javabeans.Users;
+import br.edu.insper.model.DAO;
+
+/**
+ * Servlet implementation class CompartilharPost
+ */
+@WebServlet("/delUser")
+public class DelUser extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public DelUser() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+			
+		DAO dao;
+		try {
+			dao = new DAO();
+
+			String userNameToDel = request.getParameter("userNameToDel");
+			List<Users> usersAdd = new ArrayList<>();
+			
+			String usersAdicionados = request.getParameter("usersAdicionados");
+			
+			if(usersAdicionados != null && !usersAdicionados.contentEquals("")) {
+				String[] array = usersAdicionados.split("/");
+				
+				Integer i = 0;
+				while(i < array.length) {
+					if(!String.valueOf(array[i]).contentEquals(userNameToDel)) {				
+						usersAdd.add(dao.getUserByName(String.valueOf(array[i])));
+					}
+					i++;
+				}
+			}
+						
+			for(Users user:usersAdd) {
+				System.out.print(user.getName());
+			}
+			
+			request.setAttribute("users", dao.getUsers());
+			request.setAttribute("usersAdd", usersAdd);
+			request.getRequestDispatcher("criarNovoPostCompartilhado.jsp").forward(request, response);
+			
+			dao.close();
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+}
